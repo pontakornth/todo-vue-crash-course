@@ -2,22 +2,25 @@
 <main>
   <div class="tabs">
     <div class="tab active">All</div>
-    <div class="tab">Active</div>
-    <div class="tab">Completed</div>
+    <div class="tab">Incomplete</div>
+    <div class="tab">Complete</div>
   </div>
   <div class="todo-list">
     <div class="todo-menu">
-      <input class="todo-input" name="todo-title" />
-      <button class="primary">Add Todo</button>
+      <input class="todo-input" v-model="todoInputText" name="todo-title" />
+      <button @click="addTodoItem" class="primary">Add Todo</button>
     </div>
-    <todo-item v-for="todo in todos" :key="todo.id" :todo="todo" />
+    <todo-item @remove="onRemoveTodoItem" @toggle="onToggleTodoItem" v-for="todo in visibleTodos" :key="todo.id" :todo="todo" />
   </div>
 </main>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import TodoItem from "./components/TodoItem.vue"
+import { nanoid } from "nanoid"
+import TodoItem, { Todo } from "./components/TodoItem.vue"
+
+type ViewState = 'all' | 'incomplete' | 'complete'
 
 export default defineComponent({
   name: 'App',
@@ -34,10 +37,44 @@ export default defineComponent({
           isComplete: true,
           id: "eiluriedkiki"
         }
-      ]
+      ] as Todo[],
+      todoInputText: "",
+      viewState: 'all' as ViewState
     }
   },
-  methods: {},
+  computed: {
+    visibleTodos() {
+      switch (this.viewState) {
+        case 'complete':
+          return this.todos.filter(todo => todo.isComplete)
+        case 'incomplete':
+          return this.todos.filter(todo => !todo.isComplete)
+        default:
+          return this.todos
+      }
+    }
+  },
+  methods: {
+    addTodoItem() {
+      this.todos.push({
+        id: nanoid(),
+        task: this.todoInputText,
+        isComplete: false
+      })
+    },
+    removeTodoItem(id: string) {
+      this.todos = this.todos.filter(todo => todo.id !== id)
+    },
+    onRemoveTodoItem(event: Partial<Todo>) {
+      this.removeTodoItem(event.id!!)
+    },
+    toggleTodoItem(id: string) {
+      this.todos = this.todos.map(todo => todo.id === id ? {...todo, isComplete: !todo.isComplete} : todo)
+    },
+    onToggleTodoItem(event: Partial<Todo>) {
+      this.toggleTodoItem(event.id!!)
+    }
+  },
   components: {
     TodoItem
   }

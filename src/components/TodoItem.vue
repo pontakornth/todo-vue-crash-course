@@ -1,11 +1,11 @@
 <template>
   <div class="todo-item">
     <div class="todo-content">
-      <input class="todo-checkbox" type="checkbox" name="todo"/>
+      <input @change="handleToggleTodo" class="todo-checkbox" :checked="todo.isComplete" type="checkbox" name="todo"/>
       {{todo.task}}
     </div>
     <div class="todo-action">
-      <button class="accent">Delete</button>
+      <button @click="handleRemoveTodo" class="accent">Delete</button>
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 
-type Todo = {
+export type Todo = {
   task: string,
   isComplete: boolean,
   id: string,
@@ -21,6 +21,14 @@ type Todo = {
 
 export default defineComponent({
   name: "TodoItem",
+  methods: {
+    handleToggleTodo() {
+      this.$emit("toggle", { id: this.todo.id }) 
+    },
+    handleRemoveTodo() {
+      this.$emit("remove", { id: this.todo.id })
+    }
+  },
   props: {
     todo: {
       type: Object as PropType<Todo>,
