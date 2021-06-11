@@ -1,9 +1,9 @@
 <template>
 <main>
   <div class="tabs">
-    <div class="tab active">All</div>
-    <div class="tab">Incomplete</div>
-    <div class="tab">Complete</div>
+    <button @click="changeViewState('all')" :class="`tab ${viewState == 'all' && 'active'}`">All</button>
+    <button @click="changeViewState('incomplete')" :class="`tab ${viewState == 'incomplete' && 'active'}`">Incomplete</button>
+    <button @click="changeViewState('complete')" :class="`tab ${viewState == 'complete' && 'active'}`" >Complete</button>
   </div>
   <div class="todo-list">
     <div class="todo-menu">
@@ -73,6 +73,9 @@ export default defineComponent({
     },
     onToggleTodoItem(event: Partial<Todo>) {
       this.toggleTodoItem(event.id!!)
+    },
+    changeViewState(viewState: ViewState) {
+      this.viewState = viewState
     }
   },
   components: {
